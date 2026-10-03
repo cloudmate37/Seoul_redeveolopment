@@ -6,7 +6,7 @@ PUBLIC='https://cloudmate37.github.io/Seoul_redeveolopment/'
 def save(p,data):
  p.parent.mkdir(parents=True,exist_ok=True)
  p.write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
-def build(snapshot,template,workbook_stage):
+def build(snapshot,template,workbook_stage,write_frontend=False):
  data=json.loads((snapshot/'view_data.json').read_text())
  attachments={a['id']:{k:v for k,v in a.items() if k not in {'path','sha256','bytes','error'}} for a in data['attachments']}
  for a in attachments.values():a['status']='원본 링크 보존'
@@ -32,12 +32,13 @@ def build(snapshot,template,workbook_stage):
 async function loadDistrict(id){if(!id)return null;if(cache.has(id))return cache.get(id);if(pending.has(id))return pending.get(id);$('#detail').innerHTML='<p class="muted">구역 자료를 불러오는 중입니다…</p>';const request=fetch('data/districts/'+encodeURIComponent(id)+'.json').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(d=>{cache.set(id,d);for(const a of d.attachments)attachmentMap.set(a.id,a);return d;}).finally(()=>pending.delete(id));pending.set(id,request);return request;}
 try{const response=await fetch('data/catalog.json');if(!response.ok)throw new Error('HTTP '+response.status);DATA=await response.json();}catch(error){document.querySelector('#subtitle').textContent='자료를 불러오지 못했습니다. 연결을 확인하고 새로고침하세요.';throw error;}
 '''
- (ROOT/'app.js').write_text(loader+app)
- (ROOT/'style.css').write_text(style)
+ if write_frontend:
+  (ROOT/'app.js').write_text(loader+app)
+  (ROOT/'style.css').write_text(style)
  page=text.split('<script>',1)[0]
  page=re.sub(r'<style>.*?</style>','<link rel="stylesheet" href="style.css">',page,flags=re.S)
  page=page.replace('구역 경계 전체와 교차하는 공개 도시계획·사업 자료를 수집했습니다.','2026-10-02에 수집한 자료입니다. 첨부는 서울시 원본 링크로 연결됩니다. 구역 경계 전체와 교차하는 공개 도시계획·사업 자료를 수집했습니다.')
- (ROOT/'index.html').write_text(page+'<script type="module" src="app.js"></script></html>')
+ if write_frontend:(ROOT/'index.html').write_text(page+'<script type="module" src="app.js"></script></html>')
  (ROOT/'.nojekyll').touch()
  # Rebuild workbook links for the public website, avoiding local-only paths.
  wb=json.loads((snapshot/'workbook_data.json').read_text())
@@ -57,4 +58,4 @@ try{const response=await fetch('data/catalog.json');if(!response.ok)throw new Er
  save(workbook_stage/'workbook_data.json',wb)
  print('Built',len(catalog),'districts;',len(attachments),'attachment URLs')
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('snapshot',type=pathlib.Path);p.add_argument('template',type=pathlib.Path);p.add_argument('workbook_stage',type=pathlib.Path);a=p.parse_args();build(a.snapshot,a.template,a.workbook_stage)
+ p=argparse.ArgumentParser();p.add_argument('snapshot',type=pathlib.Path);p.add_argument('template',type=pathlib.Path);p.add_argument('workbook_stage',type=pathlib.Path);p.add_argument('--write-frontend',action='store_true',help='기존 화면을 HTML 템플릿으로 덮어씁니다.');a=p.parse_args();build(a.snapshot,a.template,a.workbook_stage,a.write_frontend)
