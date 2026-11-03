@@ -1,4 +1,4 @@
-export async function createDistrictMap(districts,onSelect){
+export async function createDistrictMap(districts,onSelect,parkHistory){
  const L=window.L;
  if(!L)throw new Error('지도 라이브러리를 불러오지 못했습니다.');
  const map=L.map('map',{minZoom:9,maxZoom:19}).setView([37.5665,126.978],11);
@@ -14,21 +14,22 @@ export async function createDistrictMap(districts,onSelect){
  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  for(const f of geo.features){
   const d=catalog.get(f.properties.id);if(!d)continue;
-  const color=d.fields['추진상태']==='완료'?'#12649b':'#dc8a16';
+  const historical=Boolean(parkHistory[d.id]);
+  const color=historical?'#7637b8':d.fields['추진상태']==='완료'?'#12649b':'#dc8a16';
   const polygon=L.geoJSON(f,{style:{color,weight:1.5,fillOpacity:.22}});
-  const marker=L.circleMarker(f.properties.center,{radius:5,color:'#fff',weight:1.5,fillColor:color,fillOpacity:1});
-  const title=`${escape(d.name)}<br><span>${escape(d.fields['자치구'])} · ${escape(d.fields['추진상태'])}</span>`;
+  const marker=L.circleMarker(f.properties.center,{radius:historical?7:5,color:'#fff',weight:1.5,fillColor:color,fillOpacity:1});
+  const title=`${escape(d.name)}<br><span>${escape(d.fields['자치구'])} · ${escape(d.fields['추진상태'])}</span>${historical?'<br>박원순 재임기 확인 이력':''}`;
   polygon.bindTooltip(title,{sticky:true});marker.bindTooltip(title,{direction:'top'});
   polygon.on('click',()=>onSelect(d.id));marker.on('click',()=>onSelect(d.id));
-  entries.set(d.id,{polygon,marker,color,name:d.name});
+  entries.set(d.id,{polygon,marker,color,name:d.name,historical});
  }
  let visible=[];
  function update(filtered,selected,fit=false){
   visible=filtered;group.clearLayers();
-  for(const d of filtered){
+  for(const d of [...filtered].sort((a,b)=>Number(Boolean(parkHistory[a.id]))-Number(Boolean(parkHistory[b.id])))){
    const e=entries.get(d.id);if(!e)continue;
-   e.polygon.setStyle({color:d.id===selected?'#c83b36':e.color,weight:d.id===selected?3:1.5,fillOpacity:d.id===selected ? .4 : .22});
-   e.marker.setStyle({fillColor:d.id===selected?'#c83b36':e.color,radius:d.id===selected?7:5});
+   e.polygon.setStyle({color:e.color,weight:d.id===selected?3:1.5,fillOpacity:d.id===selected ? .4 : .22});
+   e.marker.setStyle({fillColor:e.color,radius:d.id===selected?9:e.historical?7:5,color:d.id===selected?'#c83b36':'#fff'});
    group.addLayer(e.polygon);group.addLayer(e.marker);
    const path=e.marker.getElement();
    if(path){path.setAttribute('role','button');path.setAttribute('tabindex','0');path.setAttribute('aria-label',`${e.name} 구역 상세 보기`);path.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();onSelect(d.id);}};}

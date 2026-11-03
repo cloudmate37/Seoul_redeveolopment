@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>서울 신속통합기획 지도</title><link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=map-20261003"><link rel="stylesheet" href="map.css?v=map-20261003"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>서울 신속통합기획 지도</title><link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=map-20261104"><link rel="stylesheet" href="map.css?v=map-20261104"></head>
 <body>
 <header><div class="kicker">SEOUL · URBAN ARCHIVE</div><h1>서울 신속통합기획</h1><p class="muted" id="subtitle"></p><div class="tools"><a href="https://urban.seoul.go.kr/view/map/main.html" target="_blank" rel="noopener">서울시 원본 사이트 ↗</a></div></header>
 <main class="shell">
  <div class="filters"><input id="search" aria-label="구역명·주소 검색" placeholder="구역명이나 주소를 검색하세요"><select id="district" aria-label="자치구 필터"><option value="">전체 자치구</option></select><select id="status" aria-label="추진상태 필터"><option value="">전체 추진상태</option></select><button class="plain" id="reset">초기화</button></div>
- <div class="map-caption"><p class="count" id="count"></p><div class="legend"><span><i class="pending-dot"></i>추진중</span><span><i class="complete-dot"></i>완료</span><button class="plain" id="fit-map">전체 구역 보기</button></div></div>
+ <div class="map-caption"><p class="count" id="count"></p><div class="legend"><span><i class="pending-dot"></i>추진중</span><span><i class="complete-dot"></i>완료</span><label class="park-filter"><input type="checkbox" id="park-only"><i class="park-dot" aria-hidden="true"></i>박원순 재임기 이력만 보기</label><button class="plain" id="fit-map">전체 구역 보기</button></div></div>
  <div class="layout">
   <details class="list-wrap" open><summary>구역 목록</summary><nav id="list" class="list" aria-label="신통기획 구역 목록"></nav></details>
   <section class="map-stage" aria-label="신속통합기획 구역 지도">
    <div id="map" aria-label="서울 신속통합기획 지도"></div><p class="map-hint" id="map-hint">지도에서 구역을 선택하면 상세정보가 열립니다.</p><p class="map-error" id="map-error" hidden></p>
-   <aside id="detail-drawer" hidden aria-label="선택한 구역 상세"><div class="drawer-bar"><span>구역 상세</span><button class="plain" id="close-detail" aria-label="구역 상세 닫기">닫기 ×</button></div><section id="detail" class="panel" aria-live="polite"></section></aside>
+   <aside id="detail-drawer" hidden aria-label="선택한 구역 상세"><div class="drawer-bar"><span>구역 상세</span><button class="plain" id="close-detail" aria-label="구역 상세 닫기">닫기 ×</button></div><div id="park-evidence" hidden></div><section id="detail" class="panel" aria-live="polite"></section></aside>
   </section>
  </div>
- <p class="page-foot">2026-10-02 수집 자료 · 확대하면 구역 경계를 확인할 수 있습니다. 자료기준일은 각 사업의 원본 기준이며 수집일과 다를 수 있습니다. 첨부는 서울시 원본 링크로 연결됩니다.</p>
+ <p class="page-foot">보라색: 2011.10.27.~2020.07.09. 사이 대상지 선정·정비사업 주요 이정표 확인 구역. 확인된 기록 기준이며 전체 추진 이력을 뜻하지 않습니다.<br>2026-10-02 수집 자료 · 확대하면 구역 경계를 확인할 수 있습니다. 자료기준일은 각 사업의 원본 기준이며 수집일과 다를 수 있습니다. 첨부는 서울시 원본 링크로 연결됩니다.</p>
 </main>
-<script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.js?v=map-20261003"></script>
+<script src="vendor/leaflet/leaflet.js"></script><script type="module" src="app.js?v=map-20261104"></script>
 </body></html>
